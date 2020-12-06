@@ -3,7 +3,7 @@
 Kafka exporter exports traces to Kafka. This exporter uses a synchronous producer
 that blocks and does not batch messages, therefore it should be used with batch and queued retry
 processors for higher throughput and resiliency. Message payload encoding is configurable.
- 
+
 The following settings are required:
 - `protocol_version` (no default): Kafka protocol version e.g. 2.0.0
 
@@ -19,6 +19,11 @@ The following settings can be optionally configured:
   - `plain_text`
     - `username`: The username to use.
     - `password`: The password to use
+  - `scram`
+    - `username`: The username to use.
+    - `password`: The password to use
+    - `algorithm`: The algorithm to use (sha256 or sha512)
+
   - `tls`
     - `ca_file`: path to the CA cert. For a client this verifies the server certificate. Should
       only be used if `insecure` is set to true.
@@ -26,7 +31,7 @@ The following settings can be optionally configured:
       only be used if `insecure` is set to true.
     - `key_file`: path to the TLS key to use for TLS required connections. Should
       only be used if `insecure` is set to true.
-    - `insecure` (default = false): Disable verifying the server's certificate chain and host 
+    - `insecure` (default = false): Disable verifying the server's certificate chain and host
       name (`InsecureSkipVerify` in the tls config)
     - `server_name_override`: ServerName indicates the name of the server requested by the client
       in order to support virtual hosting.
@@ -39,7 +44,7 @@ The following settings can be optionally configured:
     - `config_file`: Path to Kerberos configuration. i.e /etc/krb5.conf
     - `keytab_file`: Path to keytab file. i.e /etc/security/kafka.keytab
 - `metadata`
-  - `full` (default = true): Whether to maintain a full set of metadata. 
+  - `full` (default = true): Whether to maintain a full set of metadata.
                                     When disabled the client does not make the initial request to broker at the startup.
   - `retry`
     - `max` (default = 3): The number of retries to get metadata
