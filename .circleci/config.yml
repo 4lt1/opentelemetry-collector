@@ -294,8 +294,6 @@ jobs:
     executor: golang
     environment:
       TEST_RESULTS: testbed/tests/results/junit/results.xml
-    parallelism: 1
-    resource_class: medium+
     steps:
       - attach_to_workspace
       - install_fluentbit
@@ -312,8 +310,6 @@ jobs:
     executor: golang
     environment:
       TEST_RESULTS: testbed/tests/results/junit/results.xml
-    parallelism: 1
-    resource_class: medium+
     steps:
       - attach_to_workspace
       - run:
