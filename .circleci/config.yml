@@ -280,7 +280,7 @@ jobs:
 
   cross-compile:
     executor: golang
-    parallelism: 4
+    parallelism: 1
     steps:
       - attach_to_workspace
       - run:
@@ -294,7 +294,7 @@ jobs:
     executor: golang
     environment:
       TEST_RESULTS: testbed/tests/results/junit/results.xml
-    parallelism: 6
+    parallelism: 1
     resource_class: medium+
     steps:
       - attach_to_workspace
@@ -312,7 +312,7 @@ jobs:
     executor: golang
     environment:
       TEST_RESULTS: testbed/tests/results/junit/results.xml
-    parallelism: 4
+    parallelism: 1
     resource_class: medium+
     steps:
       - attach_to_workspace
