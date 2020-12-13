@@ -15,6 +15,7 @@
 package kafkaexporter
 
 import (
+	"github.com/gogo/protobuf/jsonpb"
 	"go.opentelemetry.io/collector/consumer/pdata"
 )
 
@@ -31,6 +32,15 @@ type TracesMarshaller interface {
 type MetricsMarshaller interface {
 	// Marshal serializes metrics into Messages
 	Marshal(metrics pdata.Metrics) ([]Message, error)
+
+	// Encoding returns encoding name
+	Encoding() string
+}
+
+// LogsMarshaller marshals metrics into Message array
+type LogsMarshaller interface {
+	// Marshal serializes metrics into Messages
+	Marshal(logs pdata.Logs) ([]Message, error)
 
 	// Encoding returns encoding name
 	Encoding() string
@@ -58,5 +68,15 @@ func metricsMarshallers() map[string]MetricsMarshaller {
 	otlppb := &otlpMetricsPbMarshaller{}
 	return map[string]MetricsMarshaller{
 		otlppb.Encoding(): otlppb,
+	}
+}
+
+// metricsMarshallers returns map of supported encodings and MetricsMarshaller
+func logsMarshallers() map[string]LogsMarshaller {
+	otlppb := &otlpLogsPbMarshaller{}
+	JSONObj := jsonMarshaller{marshaller: *jsonpb.Marshaler{}}
+	return map[string]LogsMarshaller{
+		otlppb.Encoding(): otlppb,
+		json.Encoding():   jsonMarshaller,
 	}
 }

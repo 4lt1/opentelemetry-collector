@@ -52,6 +52,11 @@ func (ld Logs) InternalRep() internal.OtlpLogsWrapper {
 	return internal.OtlpLogsWrapper{Orig: ld.orig}
 }
 
+// LogsToOtlp converts the internal MetricData to the OTLP.
+func LogsToOtlp(lg Logs) []*otlplogs.ResourceLogs {
+	return *lg.orig
+}
+
 // ToOtlpProtoBytes returns the internal Logs to OTLP Collector ExportTraceServiceRequest
 // ProtoBuf bytes. This is intended to export OTLP Protobuf bytes for OTLP/HTTP transports.
 func (ld Logs) ToOtlpProtoBytes() ([]byte, error) {

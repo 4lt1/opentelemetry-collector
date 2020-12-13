@@ -20,6 +20,7 @@ import (
 	"net"
 	"testing"
 
+	"github.com/gogo/protobuf/jsonpb"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
@@ -82,7 +83,10 @@ func TestExport(t *testing.T) {
 	resp, err := traceClient.Export(context.Background(), req)
 	require.NoError(t, err, "Failed to export trace: %v", err)
 	require.NotNil(t, resp, "The response is missing")
+	m := jsonpb.Marshaler{}
+	jsonStr, _ := m.MarshalToString(req)
 
+	fmt.Println(jsonStr)
 	// assert
 
 	require.Equal(t, 1, len(logSink.AllLogs()), "unexpected length: %v", len(logSink.AllLogs()))
