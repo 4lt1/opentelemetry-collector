@@ -19,6 +19,10 @@ The following settings can be optionally configured:
   - `plain_text`
     - `username`: The username to use.
     - `password`: The password to use
+  - `scram`
+    - `username`: The username to use.
+    - `password`: The password to use
+    - `algorithm`: The algorithm to use (sha256 or sha512)
   - `tls`
     - `ca_file`: path to the CA cert. For a client this verifies the server certificate. Should
       only be used if `insecure` is set to true.
