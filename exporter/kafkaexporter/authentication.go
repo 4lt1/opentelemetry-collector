@@ -15,6 +15,8 @@
 package kafkaexporter
 
 import (
+	"crypto/sha256"
+	"crypto/sha512"
 	"fmt"
 
 	"github.com/Shopify/sarama"
@@ -25,6 +27,7 @@ import (
 // Authentication defines authentication.
 type Authentication struct {
 	PlainText *PlainTextConfig            `mapstructure:"plain_text"`
+	SCRAM     *SCRAMConfig                `mapstructure:"scram"`
 	TLS       *configtls.TLSClientSetting `mapstructure:"tls"`
 	Kerberos  *KerberosConfig             `mapstructure:"kerberos"`
 }
@@ -33,6 +36,13 @@ type Authentication struct {
 type PlainTextConfig struct {
 	Username string `mapstructure:"username"`
 	Password string `mapstructure:"password"`
+}
+
+// SCRAMConfig defines plaintext authentication.
+type SCRAMConfig struct {
+	Username  string `mapstructure:"username"`
+	Password  string `mapstructure:"password"`
+	Algorithm string `mapstructure:"algorithm"`
 }
 
 // KerberosConfig defines kereros configuration.
@@ -56,6 +66,12 @@ func ConfigureAuthentication(config Authentication, saramaConfig *sarama.Config)
 			return err
 		}
 	}
+	if config.SCRAM != nil {
+		if err := configureSCRAM(*config.SCRAM, saramaConfig); err != nil {
+			return err
+		}
+	}
+
 	if config.Kerberos != nil {
 		configureKerberos(*config.Kerberos, saramaConfig)
 	}
@@ -66,6 +82,29 @@ func configurePlaintext(config PlainTextConfig, saramaConfig *sarama.Config) {
 	saramaConfig.Net.SASL.Enable = true
 	saramaConfig.Net.SASL.User = config.Username
 	saramaConfig.Net.SASL.Password = config.Password
+}
+
+func configureSCRAM(config SCRAMConfig, saramaConfig *sarama.Config) error {
+	saramaConfig.Net.SASL.Enable = true
+	saramaConfig.Net.SASL.User = config.Username
+	saramaConfig.Net.SASL.Password = config.Password
+	if config.Algorithm != "sha256" && config.Algorithm != "sha512" {
+		return fmt.Errorf("invalid SHA algorithm \"%s\": can be either \"sha256\" or \"sha512\"", config.Algorithm)
+	}
+	if config.Algorithm == "sha512" {
+
+		saramaConfig.Net.SASL.SCRAMClientGeneratorFunc = func() sarama.SCRAMClient { return &XDGSCRAMClient{HashGeneratorFcn: sha512.New} }
+		saramaConfig.Net.SASL.Mechanism = sarama.SASLTypeSCRAMSHA512
+	}
+
+	if config.Algorithm == "sha256" {
+
+		saramaConfig.Net.SASL.SCRAMClientGeneratorFunc = func() sarama.SCRAMClient { return &XDGSCRAMClient{HashGeneratorFcn: sha256.New} }
+		saramaConfig.Net.SASL.Mechanism = sarama.SASLTypeSCRAMSHA256
+
+	}
+
+	return nil
 }
 
 func configureTLS(config configtls.TLSClientSetting, saramaConfig *sarama.Config) error {
